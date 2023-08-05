@@ -5,60 +5,97 @@ import logging
 
 #---------------------------------------------------------------------------# 
 class ContactGui:
-	def __init__(self, contacts_list):
-		label_width = 15
-		edit_width = 40
-
+	def __init__(self, contacts_list, title="Main view", icon_path=None):
 		self._contacts_list = contacts_list
+
 		self._root = tkinter.Tk()
-		self._root.geometry('500x500')
+		self._root.geometry('600x400')
+		self._root.title(title)
 
-		# Contact list
-		self._frame_contacts = tkinter.Frame()
-		self._frame_contacts.pack(pady=10)
+		#if icon_path is not None:
+		self._root.iconphoto(False, tkinter.PhotoImage(file=icon_path))
 
-		self._contacts_scroll_bar = tkinter.Scrollbar(self._frame_contacts)
-		self._contacts_scroll_bar.pack( side = tkinter.RIGHT, fill = tkinter.Y )
+	    # layout on the root window
+		self._root.columnconfigure(0, weight=100)
+		self._root.columnconfigure(1, weight=10)
 
-		self._contacts_listbox = tkinter.Listbox(self._frame_contacts, yscrollcommand=self._contacts_scroll_bar.set, width=400, height=10)
-		self._contacts_listbox.pack(side = tkinter.LEFT, fill = tkinter.BOTH )
+		self._list_frame = self._create_list_edit_label_frame(self._root)
+		self._list_frame.grid(column=0, row=0)
 
-		self._contacts_scroll_bar.config (command= self._contacts_listbox.yview)
+		self._button_frame = self._create_button_frame(self._root)
+		self._button_frame.grid(column=1, row=0)
 
-		# Button
-		self._frame_button = tkinter.Frame()
-		self._frame_button.pack(pady=10)
-		tkinter.Button(self._frame_button,text="View",font="arial 12 bold",command=self.view).pack(side=tkinter.RIGHT)
+	def _create_list_edit_label_frame(self, container):
+		frame = tkinter.Frame(container)
 
-		# Given name
-		self._frame_given_name = tkinter.Frame()
-		self._frame_given_name.pack(pady=10)
+		frame.columnconfigure(0, weight=1)
+		frame.rowconfigure(0, weight=50)
+		frame.rowconfigure(1, weight=50)
 
-		self._given_name = tkinter.StringVar()
+		list_frame = self._create_list_frame(frame)
+		list_frame.grid(column=0, row=0)
 
-		tkinter.Label(self._frame_given_name, text = 'Name', font='arial 12 bold', width=label_width).pack(side=tkinter.LEFT)
-		tkinter.Entry(self._frame_given_name, textvariable = self._given_name,width=edit_width).pack()
+		edit_contact_frame = self._edit_contact_frame(frame)
+		edit_contact_frame.grid(column=0, row=1)
 
-		# Familly name
-		self._frame_family_name = tkinter.Frame()
-		self._frame_family_name.pack()
+		for widget in frame.winfo_children():
+			widget.grid(padx=5, pady=5)
 
-		self._family_name = tkinter.StringVar()
+		return frame
 
-		tkinter.Label(self._frame_family_name, text = 'first name', font='arial 12 bold', width=label_width).pack(side=tkinter.LEFT)
-		tkinter.Entry(self._frame_family_name, textvariable = self._family_name,width=edit_width).pack()
+	def _create_list_frame(self, container):
+		frame = tkinter.Frame(container)
 
-		# Phone number
-		self._frame_phone_number = tkinter.Frame()
-		self._frame_phone_number.pack(pady=10)
+		self._contacts_scroll_bar=tkinter.Scrollbar(frame, orient="vertical")
+		self._contacts_scroll_bar.pack(side = tkinter.RIGHT, fill = tkinter.Y)
 
-		self._phone_number = tkinter.StringVar()
-
-		tkinter.Label(self._frame_phone_number, text = 'Phone No.', font='arial 12 bold', width=label_width).pack(side=tkinter.LEFT)
-		tkinter.Entry(self._frame_phone_number, textvariable = self._phone_number,width=edit_width).pack()
+		self._contacts_listbox = tkinter.Listbox(frame, yscrollcommand=self._contacts_scroll_bar.set, width=50, height=10)
+		self._contacts_listbox.pack(side = tkinter.RIGHT, fill = tkinter.BOTH )
 
 		self.update()
+
+		return frame
 		
+	def _create_button_frame(self, container):
+		frame = tkinter.Frame(container)
+
+		frame.columnconfigure(0)
+
+		tkinter.Button(frame, text='View', command=self.view).grid(column=0, row=0)
+		# tkinter.Button(frame, text='fffff').grid(column=0, row=1)
+		# tkinter.Button(frame, text='aaaaa').grid(column=0, row=2)
+		# tkinter.Button(frame, text='bbbbb').grid(column=0, row=3)
+
+		for widget in frame.winfo_children():
+			widget.grid(padx=5, pady=5)
+
+		return frame
+
+	def _edit_contact_frame(self, container):
+		edit_width = 30
+
+		frame = tkinter.Frame(container)
+
+		frame.columnconfigure(0, weight=10)
+
+		tkinter.Label(frame, text='Family name:').grid(column=0, row=0)
+		tkinter.Label(frame, text='First name:').grid(column=0, row=1)
+		tkinter.Label(frame, text='Phone No.:').grid(column=0, row=2)
+
+		self._family_name = tkinter.StringVar()
+		self._given_name = tkinter.StringVar()
+		self._phone_number = tkinter.StringVar()
+
+		frame.columnconfigure(1, weight=10)
+		tkinter.Entry(frame, textvariable = self._family_name,width=edit_width).grid(column=1, row=0)
+		tkinter.Entry(frame, textvariable = self._given_name,width=edit_width).grid(column=1, row=1)
+		tkinter.Entry(frame, textvariable = self._phone_number,width=edit_width).grid(column=1, row=2)
+
+		for widget in frame.winfo_children():
+			widget.grid(padx=5, pady=5)
+
+		return frame
+
 	def update(self):
 		self._contacts_listbox.delete(0, tkinter.END)
 		for contact in self._contacts_list:

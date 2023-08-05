@@ -2,6 +2,7 @@
 
 import logging
 import sys
+import os
 import src.config
 import src.db
 import src.gui
@@ -34,7 +35,7 @@ if __name__ == "__main__":
 	# for contact in contacts_list:
 	# 	print("contact: {}".format(str(contact)))
 
-	gui = src.gui.ContactGui(contacts_list)
+	gui = src.gui.ContactGui(contacts_list, title=os.path.basename(__file__), icon_path="./res/contacts_book.png")
 	gui.run()
 
 	logging.info('Done')
